@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -16,6 +18,21 @@ def _fixed(fig: go.Figure, height: int = 360, **layout) -> go.Figure:
     fig.update_xaxes(fixedrange=True)
     fig.update_yaxes(fixedrange=True)
     return fig
+
+
+def _ref_line(fig: go.Figure, value: float, line: dict, text: str, position: str, axis: str) -> None:
+    """Referenzlinie mit Beschriftung auf einer logarithmischen Achse: die Linie liegt auf dem Datenwert, die Beschriftung braucht log10 des Werts
+    (add_hline und add_vline setzen beide auf denselben Wert, die Beschriftung sitzt dann falsch und dehnt die Achse)."""
+    if not value > 0.0:
+        return
+    pos = math.log10(value)
+    top, left = "top" in position, "left" in position
+    if axis == "y":
+        fig.add_hline(y=value, line=line)
+        fig.add_annotation(xref="paper", yref="y", x=0 if left else 1, y=pos, text=text, showarrow=False, xanchor="left" if left else "right", yanchor="bottom" if top else "top")
+    else:
+        fig.add_vline(x=value, line=line)
+        fig.add_annotation(xref="x", yref="paper", x=pos, y=1 if top else 0, text=text, showarrow=False, xanchor="right" if left else "left", yanchor="top" if top else "bottom")
 
 
 def build_table(a: Analysis, rows: int = 40) -> pd.DataFrame:
@@ -49,9 +66,9 @@ def build_training_chart(a: Analysis) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=steps, y=[h["train"] for h in a.hist], mode="lines+markers", name="Training", line=dict(color=C.COLOR_NET, width=3), marker=dict(size=6)))
     fig.add_trace(go.Scatter(x=steps, y=[h["val"] for h in a.hist], mode="lines+markers", name="Test", line=dict(color=C.COLOR_L1, width=2, dash="dash"), marker=dict(size=6)))
-    fig.add_hline(y=a.err_ista, line=dict(color=C.COLOR_ISTA, width=1.5, dash="dash"), annotation_text="ISTA (gleiche Schichten)", annotation_position="top left")
-    fig.add_hline(y=a.err_fista, line=dict(color=C.COLOR_FISTA, width=1.5, dash="dash"), annotation_text="FISTA", annotation_position="bottom left")
-    fig.add_hline(y=a.err_l1, line=dict(color=C.COLOR_L1, width=1.5, dash="dot"), annotation_text="L1 exakt", annotation_position="bottom right")
+    _ref_line(fig, a.err_ista, dict(color=C.COLOR_ISTA, width=1.5, dash="dash"), "ISTA (gleiche Schichten)", "top left", "y")
+    _ref_line(fig, a.err_fista, dict(color=C.COLOR_FISTA, width=1.5, dash="dash"), "FISTA", "bottom left", "y")
+    _ref_line(fig, a.err_l1, dict(color=C.COLOR_L1, width=1.5, dash="dot"), "L1 exakt", "bottom right", "y")
     fig.update_xaxes(title="Trainingsschritt")
     fig.update_yaxes(title="Median-Fehler", type="log", exponentformat="power")
     return _fixed(fig, 340)
@@ -63,11 +80,11 @@ def build_param_chart(a: Analysis) -> go.Figure:
     layers = list(range(1, len(p["th"]) + 1))
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=layers, y=p["th"] / t, mode="lines+markers", name="Schwelle λ_k = θ_k / t", line=dict(color=C.COLOR_NET, width=3), marker=dict(size=7)))
-    fig.add_hline(y=a.lam0, line=dict(color=C.COLOR_NET, width=1.5, dash="dot"), annotation_text="ISTA: λ", annotation_position="top left")
+    _ref_line(fig, a.lam0, dict(color=C.COLOR_NET, width=1.5, dash="dot"), "ISTA: λ", "top left", "y")
     if "gam" in p:
         fig.add_trace(go.Scatter(x=layers, y=p["gam"] / t, mode="lines+markers", name="Schrittweite γ_k / t", line=dict(color=C.COLOR_L1, width=3), marker=dict(size=7)))
-        fig.add_hline(y=1.0, line=dict(color=C.COLOR_L1, width=1.5, dash="dot"), annotation_text="ISTA: 1", annotation_position="bottom left")
-        fig.add_hline(y=C.STEP_OVER, line=dict(color=C.COLOR_ISTA, width=1, dash="dash"), annotation_text="2 / L", annotation_position="top right")
+        _ref_line(fig, 1.0, dict(color=C.COLOR_L1, width=1.5, dash="dot"), "ISTA: 1", "bottom left", "y")
+        _ref_line(fig, C.STEP_OVER, dict(color=C.COLOR_ISTA, width=1, dash="dash"), "2 / L", "top right", "y")
     fig.update_xaxes(title="Schicht", tickvals=layers)
     fig.update_yaxes(title="Wert", type="log", exponentformat="power")
     return _fixed(fig, 340)
