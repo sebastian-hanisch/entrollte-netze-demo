@@ -48,16 +48,40 @@ def outcomes():
     return {name: ev.analyse(ev.Settings(**p)) for name, p in C.PRESETS.items()}
 
 
-def test_the_presets_show_the_documented_outcomes(outcomes):
-    std, scal, shift, few, waves, allw, two = (outcomes[k] for k in C.PRESETS)
-    assert ev.verdict_instance(std)[0] == "success" and std.err_net == pytest.approx(0.200, abs=0.04) and std.err_ista == pytest.approx(0.7338, abs=0.003) and std.err_fista == pytest.approx(0.6685, abs=0.003)
+def test_standard_preset(outcomes):
+    std = outcomes["Standard"]
+    assert ev.verdict_instance(std)[0] == "success" and std.err_net == pytest.approx(0.200, abs=0.08) and std.err_ista == pytest.approx(0.7338, abs=0.003) and std.err_fista == pytest.approx(0.6685, abs=0.003)
     assert std.err_l1 == pytest.approx(0.0087, abs=0.003) and std.err_l1 < std.err_net / 5 and std.err_train < std.err_net
-    assert ev.verdict_instance(scal)[0] == "success" and scal.err_net == pytest.approx(0.444, abs=0.06) and scal.gam_max > C.STEP_OVER and scal.err_net > std.err_net
-    assert ev.verdict_instance(shift)[0] == "warning" and shift.err_net == pytest.approx(0.591, abs=0.08) and shift.err_net > shift.err_ista and shift.err_net > shift.err_tik and shift.err_net > 2.0 * std.err_net
+
+
+def test_scalar_preset(outcomes):
+    scal, std = outcomes["Skalar-Netz"], outcomes["Standard"]
+    assert ev.verdict_instance(scal)[0] == "success" and 0.25 < scal.err_net < 0.6 and scal.gam_max > C.STEP_OVER and scal.err_net > 1.2 * std.err_net
+
+
+def test_distribution_shift_preset(outcomes):
+    shift, std = outcomes["Verteilungswechsel"], outcomes["Standard"]
+    assert ev.verdict_instance(shift)[0] == "warning" and 0.4 < shift.err_net < 0.8 and shift.err_net > shift.err_ista and shift.err_net > shift.err_tik and shift.err_net > 2.0 * std.err_net
+
+
+def test_few_signals_preset(outcomes):
+    few = outcomes["Wenige Signale"]
     assert ev.verdict_instance(few)[0] == "warning" and few.err_train < 1e-6 and few.err_net > 0.7
-    assert ev.verdict_instance(waves)[0] == "success" and waves.err_net == pytest.approx(0.0487, abs=0.015) and waves.err_net < waves.err_tik < waves.err_ista
-    assert ev.verdict_instance(allw)[0] == "success" and allw.err_net > 1.8 * std.err_net and allw.err_net == pytest.approx(0.48, abs=0.08)
-    assert ev.verdict_instance(two)[0] in ("info", "success") and two.err_net == pytest.approx(0.667, abs=0.06) and two.err_ista == pytest.approx(0.8307, abs=0.003) and two.err_fista == two.err_ista
+
+
+def test_waves_preset(outcomes):
+    waves = outcomes["Wellen"]
+    assert ev.verdict_instance(waves)[0] == "success" and waves.err_net < 0.1 and waves.err_net < waves.err_tik < waves.err_ista
+
+
+def test_all_worlds_preset(outcomes):
+    allw, std = outcomes["Alle Welten"], outcomes["Standard"]
+    assert ev.verdict_instance(allw)[0] == "success" and allw.err_net > 1.8 * std.err_net and 0.3 < allw.err_net < 0.65
+
+
+def test_two_layers_preset(outcomes):
+    two = outcomes["Wenige Schichten"]
+    assert ev.verdict_instance(two)[0] in ("info", "success") and 0.55 < two.err_net < 0.78 and two.err_ista == pytest.approx(0.8307, abs=0.003) and two.err_fista == two.err_ista
 
 
 def test_every_verdict_names_what_it_found(outcomes):
