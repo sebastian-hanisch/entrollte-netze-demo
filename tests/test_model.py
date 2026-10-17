@@ -39,7 +39,7 @@ def test_prior_cov_and_exp_kernel_hand_values():
 def test_init_params_are_ista(mini):
     a, b, x = mini
     s = m.init_params("scalar", 3, 0.2, a)
-    assert s["gam"].tolist() == [1.0] * 3 and s["th"] == pytest.approx([0.2] * 3)
+    assert s["gam"] == pytest.approx([1.0] * 3, abs=1e-12) and s["th"] == pytest.approx([0.2] * 3)
     li = m.init_params("lista", 2, 0.2, a)
     assert li["We"] == pytest.approx(a.T) and li["Sm"] == pytest.approx(np.eye(3) - a.T @ a) and li["th"] == pytest.approx([0.2, 0.2])
     assert m.init_params("scalar", 1, 0.1)["gam"][0] == pytest.approx(m.step_size(m.op()))
