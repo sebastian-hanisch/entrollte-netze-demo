@@ -56,7 +56,7 @@ Spitzen-Welt, Rauschen 1 %, 100 Testsignale (Median), wenn nicht anders genannt;
 | **Das Netz gilt überall** | Außerhalb der Trainingsverteilung verliert es gegen Tikhonov und ISTA (Experiment 3). | Stück 15 (Diffusions-Prior) |
 | **Mehr Parameter helfen** | Bei wenigen Trainingssignalen lernt LISTA sie auswendig (Experiment 4). | – |
 | **Es ist ein Löser** | Die gelernten Schrittweiten liegen weit über 2/L; die Iteration konvergiert nicht, sie ist auf K Schichten abgestimmt. | – |
-| **Ein Training genügt** | Jede Zahl ist ein Training mit festem Seed und hängt von der Plattform ab (Skalar-Netz: 44,4 % unter Windows, 36,2 % unter Linux); Mehrfachläufe, andere Optimierer und Gewichtsabfall sind nicht gebaut. | – |
+| **Ein Training genügt** | Jede Zahl ist ein Training mit festem Seed und hängt von der Plattform ab (Testfehler des Skalar-Netzes relativ zur Signalnorm: 44,4 % unter Windows, 36,2 % unter Linux); Mehrfachläufe, andere Optimierer und Gewichtsabfall sind nicht gebaut. | – |
 | **Operator und Welten** | Eine Toeplitz-Faltung (w = 0,03, n = 48), von Hand gebaute Trainingsverteilungen, eine Dimension. | – |
 
 Die Zahlen gelten für diese erfundene Welt und zeigen nichts über echte Messungen.
