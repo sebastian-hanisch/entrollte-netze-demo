@@ -84,11 +84,11 @@ PRESETS = {
     "Wenige Schichten": dict(_BASE, k=2),
 }
 PRESET_HELP = {
-    "Standard": "Zehn Schichten LISTA auf zufälligen Spitzen: 20,0 % Testfehler gegen 73,4 % (ISTA) und 66,9 % (FISTA) mit zehn Schritten; das exakte L1 hat 0,9 %.",
-    "Skalar-Netz": "Das Skalar-Netz (20 Parameter) lernt weniger: 44,4 % Testfehler; die größte gelernte Schrittweite ist das 14,9-Fache von 1/‖A‖².",
-    "Verteilungswechsel": "Auf Spitzen trainiert, auf Blöcken getestet: 59,1 % Testfehler, schlechter als ISTA (22,2 %) und Tikhonov (18,1 %).",
-    "Wenige Signale": "20 Trainingssignale: Trainingsfehler 0 %, Testfehler 92,8 %: LISTA lernt die Signale auswendig.",
-    "Wellen": "Auf Dreieckswellen trainiert und getestet: 4,9 % Testfehler gegen 11,4 % (ISTA) und 10,0 % (Tikhonov).",
-    "Alle Welten": "Auf allen vier Welten trainiert, auf Spitzen getestet: 48,0 % statt 20,0 % beim Training auf Spitzen allein: ein Kompromiss.",
-    "Wenige Schichten": "Zwei Schichten: 66,7 % gegen 83,1 % bei ISTA und FISTA mit zwei Schritten; die Schichtzahl begrenzt die Genauigkeit.",
+    "Standard": "Zehn Schichten LISTA auf zufälligen Spitzen: der Testfehler liegt bei rund einem Fünftel, ISTA und FISTA mit zehn Schritten erreichen 73,4 % und 66,9 %, das exakte L1 0,9 %.",
+    "Skalar-Netz": "Das Skalar-Netz (20 Parameter) lernt weniger als LISTA (Testfehler zwischen einem Drittel und der Hälfte); die größte gelernte Schrittweite liegt weit über dem Doppelten von 1/‖A‖².",
+    "Verteilungswechsel": "Auf Spitzen trainiert, auf Blöcken getestet: der Testfehler liegt weit über dem von ISTA (22,2 %) und Tikhonov (18,1 %).",
+    "Wenige Signale": "20 Trainingssignale: der Trainingsfehler ist 0 %, der Testfehler liegt weit darüber: LISTA lernt die Signale auswendig.",
+    "Wellen": "Auf Dreieckswellen trainiert und getestet: der Testfehler liegt deutlich unter dem von ISTA (11,4 %) und Tikhonov (10,0 %).",
+    "Alle Welten": "Auf allen vier Welten trainiert, auf Spitzen getestet: der Testfehler liegt weit über dem bei Training auf Spitzen allein: ein Kompromiss.",
+    "Wenige Schichten": "Zwei Schichten: besser als ISTA und FISTA mit zwei Schritten (83,1 %), aber die Schichtzahl begrenzt die Genauigkeit.",
 }

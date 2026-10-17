@@ -23,10 +23,11 @@ Alles ist erfunden; die Wahrheit sind die simulierten Signale.
 - **Verdikt:** „lohnt“, wenn der Testfehler höchstens 80 % des besseren von ISTA und FISTA mit derselben Schichtzahl beträgt; „kaum besser“ bis 100 %; sonst „lohnt nicht“. Dazu Hinweise: das exakte L1 ist besser (das Netz holt die Iteration ein, nicht die Lösung), Überanpassung (Trainingsfehler höchstens halb so groß wie der Testfehler), Verteilungswechsel, abgeschaltete Schwellen, gelernte Schrittweiten über 2/L.
 - **Experimente** laufen über feste Zufallsströme (SplitMix64, Seeds ab 1000), **ein Training je Zelle**, je mit eigenem Rechenknopf (30 bis 60 Sekunden); ein einzelnes Netz („Netz trainieren“) braucht 2 bis 20 Sekunden.
 - **Gleichstände und letzte Stellen** werden nicht festgelegt; Zahlen ohne Training (ISTA, FISTA, L1, Tikhonov, Posterior-Mittel, kleinste Quadrate) sind eng gepinnt, trainierte Zahlen mit weiter Toleranz und als Ungleichungen.
+- **Trainierte Zahlen hängen von der Plattform ab:** Adam rechnet 1000 Schritte, und kleine Unterschiede der Gleitkommaarithmetik wachsen mit. Die Tabellen unten stammen aus einem Lauf unter Windows; unter Linux (CI und Streamlit Cloud) kam das Skalar-Netz mit zehn Schichten auf 36,2 statt 44,4 %. Die Tests prüfen deshalb Bänder und Ungleichungen; die Aussagen gelten auf beiden Plattformen.
 
 ## Befunde (gemessen, keine Behauptungen)
 
-Spitzen-Welt, Rauschen 1 %, 100 Testsignale (Median), wenn nicht anders genannt. Jede Zahl steht in `tests/test_claims.py` oder `tests/test_presets.py`.
+Spitzen-Welt, Rauschen 1 %, 100 Testsignale (Median), wenn nicht anders genannt; **trainierte Zahlen aus einem Windows-Lauf, unter Linux einige Prozentpunkte anders** (Methodik). Jede Aussage steht als Band oder Ungleichung in `tests/test_claims.py` oder `tests/test_presets.py`.
 
 | Frage | Befund | Test |
 |---|---|---|
@@ -37,7 +38,7 @@ Spitzen-Welt, Rauschen 1 %, 100 Testsignale (Median), wenn nicht anders genannt.
 | Gilt das Netz außerhalb seiner Trainingswelt (Experiment 3, K = 5)? | **Nein:** LISTA auf Spitzen trainiert: Spitzen **27,6 %**, Blöcke **50,7 %**, Wellen 44,6 %, Phantom 45,6 % (Tikhonov 50,6 / 17,9 / 9,4 / 9,9 %, ISTA 78,3 / 25,5 / 11,7 / 12,9 %); auf Blöcken trainiert: Blöcke 19,2 %, Spitzen 69,0 %; auf Wellen: Wellen **5,1 %** (Tikhonov 9,4 %); auf allen vier gemischt: Spitzen 59,8 %, Blöcke 19,2 %. Das **Skalar-Netz** von den Spitzen erzeugt auf Blöcken **122 %**. | `test_a_network_is_the_prior_of_its_training_distribution` |
 | Muss das Trainingsrauschen passen? | **Kaum:** Test bei 1 % nach Training bei 0,1 / 1 / 10 %: 27,6 / 27,6 / 28,8 % (bei so wenigen Schichten begrenzt die Schichtzahl, nicht das Rauschen). | `test_the_training_noise_hardly_matters_at_few_layers` |
 | Überanpassung (Experiment 4, K = 5)? | **LISTA (4613 Parameter)** mit 20 / 100 / 500 / 2000 Trainingssignalen: Trainingsfehler **0 % / 0,01 % / 19,1 % / 25,7 %**, Testfehler **106 % / 94,1 % / 44,2 % / 27,6 %**. Das **Skalar-Netz (10 Parameter)** überanpasst nicht (47,5 / 49,8 % bei 20 Signalen), lernt aber auch weniger (ISTA: 78,3 %). | `test_lista_memorizes_few_signals_…` |
-| Einzelstichproben (Presets, K = 10, 1000 Schritte) | **Standard** (LISTA, Spitzen): Testfehler **20,0 %** gegen 73,4 % (ISTA) und 66,9 % (FISTA), exaktes L1 0,9 %. **Skalar-Netz:** 44,4 %, größte Schrittweite 14,9/L. **Verteilungswechsel** (Spitzen → Blöcke): 59,1 %, ISTA 22,2 %, Tikhonov 18,1 %. **20 Trainingssignale:** Trainingsfehler 0 %, Testfehler 92,8 %. **Wellen:** 4,9 % gegen 11,4 % (ISTA) und 10,0 % (Tikhonov). **Alle Welten:** 48,0 %. **Zwei Schichten:** 66,7 % gegen 83,1 %. | `tests/test_presets.py` |
+| Einzelstichproben (Presets, K = 10, 1000 Schritte, Windows-Lauf) | **Standard** (LISTA, Spitzen): Testfehler rund **20 %** gegen 73,4 % (ISTA) und 66,9 % (FISTA), exaktes L1 0,9 %. **Skalar-Netz:** rund 40 % (Windows 44,4 %, Linux 36,2 %), größte Schrittweite über 2/L. **Verteilungswechsel** (Spitzen → Blöcke): rund 59 %, ISTA 22,2 %, Tikhonov 18,1 %. **20 Trainingssignale:** Trainingsfehler 0 %, Testfehler über 70 %. **Wellen:** rund 5 % gegen 11,4 % (ISTA) und 10,0 % (Tikhonov). **Alle Welten:** rund 48 %. **Zwei Schichten:** rund 67 % gegen 83,1 %. | `tests/test_presets.py` |
 | Mini-Instanz von Hand | n = 3, A symmetrisch (Eigenwerte 1 / 0,5 / 0,1), b = (1,3, 1,4, 1,3), x = (1, 2, 1): Skalar-Netz mit γ = 1, θ = 0,1 gibt (1,23, 1,24, 1,23), Verlust 0,1139, dL/dθ = 0,1, dL/dγ = −0,135533; LISTA dL/dW_e[0, 0] = 0,099667; ISTA nach zwei Schritten (1,2267, 1,2466, 1,2267). | `tests/test_model.py` |
 
 ## Befunde und Korrekturen gegenüber dem Plan
@@ -55,7 +56,7 @@ Spitzen-Welt, Rauschen 1 %, 100 Testsignale (Median), wenn nicht anders genannt.
 | **Das Netz gilt überall** | Außerhalb der Trainingsverteilung verliert es gegen Tikhonov und ISTA (Experiment 3). | Stück 15 (Diffusions-Prior) |
 | **Mehr Parameter helfen** | Bei wenigen Trainingssignalen lernt LISTA sie auswendig (Experiment 4). | – |
 | **Es ist ein Löser** | Die gelernten Schrittweiten liegen weit über 2/L; die Iteration konvergiert nicht, sie ist auf K Schichten abgestimmt. | – |
-| **Ein Training genügt** | Jede Zahl ist ein Training mit festem Seed; Mehrfachläufe, andere Optimierer und Gewichtsabfall sind nicht gebaut. | – |
+| **Ein Training genügt** | Jede Zahl ist ein Training mit festem Seed und hängt von der Plattform ab (Skalar-Netz: 44,4 % unter Windows, 36,2 % unter Linux); Mehrfachläufe, andere Optimierer und Gewichtsabfall sind nicht gebaut. | – |
 | **Operator und Welten** | Eine Toeplitz-Faltung (w = 0,03, n = 48), von Hand gebaute Trainingsverteilungen, eine Dimension. | – |
 
 Die Zahlen gelten für diese erfundene Welt und zeigen nichts über echte Messungen.
