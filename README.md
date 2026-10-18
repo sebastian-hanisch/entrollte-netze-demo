@@ -1,5 +1,7 @@
 # Entrollte Netze: ISTA mit gelernten Parametern – Streamlit-Demo
 
+**[→ Demo live ausprobieren](https://sebastianhanisch-entrollte-netze-demo.streamlit.app/)**
+
 Vierzehntes Stück der Linie **Inverse Probleme und Regularisierung** in der „Konzepte“-Reihe im Portfolio von [Sebastian Hanisch](https://sebastianhanisch.net) (Operations Research und Machine Learning). Es baut auf [plug-and-play-demo](https://github.com/sebastian-hanisch/plug-and-play-demo), [sparsity-tv-demo](https://github.com/sebastian-hanisch/sparsity-tv-demo), [bayes-map-demo](https://github.com/sebastian-hanisch/bayes-map-demo) und [iterativ-demo](https://github.com/sebastian-hanisch/iterativ-demo) auf und nutzt dieselbe Welt: eine lineare Entfaltung (n = 48) mit Gauß-Unschärfe (w = 0,03) und weißem Rauschen. Die Wahrheit ist bekannt, weil die Signale selbst die Wahrheit sind; sie dient hier nur als Maßstab.
 
 ## Kernfrage
